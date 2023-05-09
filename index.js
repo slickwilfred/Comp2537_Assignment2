@@ -68,13 +68,19 @@ async function isAdmin(req) {
   return false;
 }
 
-
-async function sessionAndAdminValidation(req, res, next) {
-  if (!isValidSession(req)) {
+function sessionValidation(req, res, next) {
+  if (isValidSession(req)) {
+    next();
+  } else {
     res.redirect('/login');
-  } else if (!(await isAdmin(req))) {
+  }
+}
+
+
+async function adminValidation(req, res, next) {
+  if (! (await isAdmin(req))) {
     res.status(403);
-    res.render('error', { message: "You are not authorized to view this page." });
+    res.render('error', { message: 'You are not authorized to view this page.' });
   } else {
     next();
   }
@@ -230,7 +236,7 @@ app.post('/loggingin', async (req,res) => {
 
 
 //Admin Route
-app.get('/admin', sessionAndAdminValidation, async (req, res) => {
+app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
   try {
     const users = await userCollection.find({}).toArray();
     res.render('admin', { users });
@@ -241,15 +247,15 @@ app.get('/admin', sessionAndAdminValidation, async (req, res) => {
 });
 
 
-app.post('/promote/:userId', sessionAndAdminValidation, async (req, res) => {
-  const userId = req.params.userId; // Access user ID from the URL parameter
+app.post('/promote/:userId', sessionValidation, adminValidation, async (req, res) => {
+  const userId = req.params.userId;
   const result = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { userType: 'admin' } });
   console.log('User promoted to admin role.');
   res.redirect('/admin');
 });
 
-app.post('/demote/:userId', sessionAndAdminValidation, async (req, res) => {
-  const userId = req.params.userId; // Access user ID from the URL parameter
+app.post('/demote/:userId', sessionValidation, adminValidation, async (req, res) => {
+  const userId = req.params.userId; 
   const result = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { userType: 'user' } });
   console.log('User demoted from admin role.');
   res.redirect('/admin');
