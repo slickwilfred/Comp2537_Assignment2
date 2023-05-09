@@ -9,12 +9,12 @@
         <%- include('templates/user', {user: users[i]}) %>
         <div class="btn-toolbar" role="toolbar">
           <div class="btn-group me-2" role="group">
-            <form action="/promoteUser/<%= users[i]._id %>" method="post">
+            <form action="/promote/<%= users[i]._id %>" method="post">
               <button type="submit" class="btn btn-sm btn-danger">Promote to Admin</button>
             </form>
           </div>
           <div class="btn-group" role="group">
-            <form action="/demoteUser/<%= users[i]._id %>" method="post">
+            <form action="/demote/<%= users[i]._id %>" method="post">
               <button type="submit" class="btn btn-sm btn-success">Demote to User</button>
             </form>
           </div>
