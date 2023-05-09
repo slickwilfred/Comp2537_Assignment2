@@ -59,14 +59,6 @@ function isValidSession(req) {
   return false;
 }
 
-function sessionValidation(req, res, next){
-  if (isValidSession(req)) {
-    next();
-  } else {
-    res.redirect('/login');
-  }
-}
-
 async function isAdmin(req) {
   const email = req.session.email;
   const user = await userCollection.findOne({ email: email });
@@ -77,16 +69,16 @@ async function isAdmin(req) {
 }
 
 
-async function adminValidation(req, res, next) {
-  if (!(await isAdmin(req))) {
+async function sessionAndAdminValidation(req, res, next) {
+  if (!isValidSession(req)) {
+    res.redirect('/login');
+  } else if (!(await isAdmin(req))) {
     res.status(403);
     res.render('error', { message: "You are not authorized to view this page." });
-    return;
   } else {
     next();
   }
 }
-
 
 //Prevent NoSQL injection attacks
 app.get('/nos1l-injection', async (req,res) => {
@@ -237,19 +229,8 @@ app.post('/loggingin', async (req,res) => {
 });
 
 
-function requireLoginOrShowMessage(req, res, next) {
-  if (!isValidSession(req)) {
-    res.redirect('/login');
-  } else if (!isAdmin(req)) {
-    res.status(403).send('You must be an admin to view this page.');
-  } else {
-    next();
-  }
-}
-
-
 //Admin Route
-app.get('/admin', requireLoginOrShowMessage, async (req, res) => {
+app.get('/admin', sessionAndAdminValidation, async (req, res) => {
   try {
     const users = await userCollection.find({}).toArray();
     res.render('admin', { users });
@@ -260,15 +241,14 @@ app.get('/admin', requireLoginOrShowMessage, async (req, res) => {
 });
 
 
-
-app.post('/promote/:userId', sessionValidation, adminValidation, async (req, res) => {
+app.post('/promote/:userId', sessionAndAdminValidation, async (req, res) => {
   const userId = req.params.userId; // Access user ID from the URL parameter
   const result = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { userType: 'admin' } });
   console.log('User promoted to admin role.');
   res.redirect('/admin');
 });
 
-app.post('/demote/:userId', sessionValidation, adminValidation, async (req, res) => {
+app.post('/demote/:userId', sessionAndAdminValidation, async (req, res) => {
   const userId = req.params.userId; // Access user ID from the URL parameter
   const result = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { userType: 'user' } });
   console.log('User demoted from admin role.');
