@@ -4,7 +4,7 @@
   <div class="row justify-content-center">
     <div class="col-md-6">
       <% if(locals.email) { %>
-        <p class="lead">Hello, <%= locals.name %>!</p>
+        <p class="lead">Hello, <%= locals.name %></p>
         <a class="btn btn-primary mb-3" href="/members" role="button">Members Area</a><br>
         <form action="/logout" method="post">
           <button class="btn btn-danger" type="submit">Logout</button>
