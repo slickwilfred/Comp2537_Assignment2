@@ -237,11 +237,19 @@ app.post('/loggingin', async (req,res) => {
 });
 
 
-
+function requireLoginOrShowMessage(req, res, next) {
+  if (!isValidSession(req)) {
+    res.redirect('/login');
+  } else if (!isAdmin(req)) {
+    res.status(403).send('You must be an admin to view this page.');
+  } else {
+    next();
+  }
+}
 
 
 //Admin Route
-app.get('/admin', adminValidation, async (req, res) => {
+app.get('/admin', requireLoginOrShowMessage, async (req, res) => {
   try {
     const users = await userCollection.find({}).toArray();
     res.render('admin', { users });
@@ -250,6 +258,7 @@ app.get('/admin', adminValidation, async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 app.post('/promote/:userId', sessionValidation, adminValidation, async (req, res) => {
