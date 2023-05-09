@@ -1,0 +1,28 @@
+<%- include("templates/header") %>
+
+<body class="text-center">
+  <main class="form-signin">
+    <form action='/loggingin' method='post' style="max-width: 330px; margin: 0 auto;">
+      <% if (locals.alreadyLoggedIn) { %>
+        <h3>You're already logged in.</h3>
+      <% } else { %> 
+      <h1 class="h3 mb-3 fw-normal">Log In</h1>
+      <% if(req.query.error){ %>
+        <p style="color:red">Invalid email address</p>
+      <% } %>
+      <div class="form-floating mb-3">
+        <input name='email' type='text' class="form-control" id="floatingInput" placeholder="name@example.com" value='<%= locals.req.query.email ? locals.req.query.email : "" %>'>
+        <label for="floatingInput">Email</label>
+      </div>
+      <div class="form-floating mb-3">
+        <input name='password' type='password' class="form-control" id="floatingPassword" placeholder="Password">
+        <label for="floatingPassword">Password</label>
+      </div>
+      </div>
+      <button class="w-100 btn btn-lg btn-primary" type="submit">Submit</button>
+    </form>
+    <% } %>
+  </main>
+</body>
+
+<%- include("templates/footer") %>

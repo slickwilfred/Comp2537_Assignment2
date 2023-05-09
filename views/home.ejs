@@ -1,0 +1,22 @@
+<%- include("templates/header") %>
+
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <% if(locals.email) { %>
+        <p class="lead">Hello, <%= locals.name %>!</p>
+        <a class="btn btn-primary mb-3" href="/members" role="button">Members Area</a><br>
+        <form action="/logout" method="post">
+          <button class="btn btn-danger" type="submit">Logout</button>
+        </form>
+      <% } else { %>
+        <h3 class="mb-3">Welcome to the Home page.</h3>
+        <p>You must be logged in to gain access to the site.</p>
+        <a class="btn btn-primary mb-3" href="/signup" role="button">Sign Up</a>
+        <a class="btn btn-secondary mb-3" href="/login" role="button">Log In</a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include("templates/footer") %>
