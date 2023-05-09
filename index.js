@@ -234,7 +234,6 @@ app.post('/loggingin', async (req,res) => {
 
 });
 
-
 //Admin Route
 app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
   try {
@@ -246,7 +245,7 @@ app.get('/admin', sessionValidation, adminValidation, async (req, res) => {
   }
 });
 
-
+//Promote route
 app.post('/promote/:userId', sessionValidation, adminValidation, async (req, res) => {
   const userId = req.params.userId;
   const result = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { userType: 'admin' } });
@@ -254,13 +253,13 @@ app.post('/promote/:userId', sessionValidation, adminValidation, async (req, res
   res.redirect('/admin');
 });
 
+//Demote route
 app.post('/demote/:userId', sessionValidation, adminValidation, async (req, res) => {
   const userId = req.params.userId; 
   const result = await userCollection.updateOne({ _id: new ObjectId(userId) }, { $set: { userType: 'user' } });
   console.log('User demoted from admin role.');
   res.redirect('/admin');
 });
-
 
 //Members page route
 app.get('/members', (req,res) => {
